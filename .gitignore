@@ -1,0 +1,36 @@
+# Genel dosyalar (frontend ve backend için geçerli)
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Sanal ortam
+venv/
+ENV/
+env/
+
+# Çevre değişkenleri
+*.env
+
+# IDE/Editor dosyaları
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS-specific dosyalar
+.DS_Store
+
+# Node.js (Frontend)
+node_modules/
+build/
+dist/
+
+# Django (Backend)
+db.sqlite3
+*.sqlite3
+*/migrations/
+staticfiles/
+media/
