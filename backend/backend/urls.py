@@ -15,8 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from .views import VideoUploadView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('api/auth/', include('dj_rest_auth.urls')),  # Oturum açma ve çıkma için URL'ler
+    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),  # Kullanıcı kaydı için URL'ler
+    path('api/videos/upload/', VideoUploadView.as_view(), name='video-upload'),  # Video yükleme URL'si
 ]
+
