@@ -133,8 +133,27 @@ def load_model(filename):
 def main():
     # Training dataset
     training_data = [
-        {"path": "videos/gerçek.mp4", "label": 0},
-        {"path": "videos/aivideo5.mp4", "label": 1},
+        {"path": "video_analysis/training_data/gerçek.mp4", "label": 0},
+        {"path": "video_analysis/training_data/gerçek2.mp4", "label": 0},
+        {"path": "video_analysis/training_data/babyCrawling.mp4", "label": 0},
+        {"path": "video_analysis/training_data/basketball.mp4", "label": 0},
+        {"path": "video_analysis/training_data/biking.mp4", "label": 0},
+        {"path": "video_analysis/training_data/blowDryHair.mp4", "label": 0},
+        {"path": "video_analysis/training_data/blowingCandle.mp4", "label": 0},
+        {"path": "video_analysis/training_data/headMasage.mp4", "label": 0},
+        {"path": "video_analysis/training_data/hulahoop.mp4", "label": 0},
+        {"path": "video_analysis/training_data/ai video.mp4", "label": 1},
+        {"path": "video_analysis/training_data/aiBabyCrawling.mp4", "label": 1},
+        {"path": "video_analysis/training_data/aiBasketball.mp4", "label": 1},
+        {"path": "video_analysis/training_data/aiBlowDryHair.mp4", "label": 1},
+        {"path": "video_analysis/training_data/aiBlowingCandle.mp4", "label": 1},
+        {"path": "video_analysis/training_data/aiHeadMasage.mp4", "label": 1},
+        {"path": "video_analysis/training_data/aiHulahoop.mp4", "label": 1},
+        {"path": "video_analysis/training_data/aivideo2.mp4", "label": 1},
+        {"path": "video_analysis/training_data/aivideo3.mp4", "label": 1},
+        {"path": "video_analysis/training_data/aivideo5.mp4", "label": 1},
+
+
     ]
 
     X, y = [], []
