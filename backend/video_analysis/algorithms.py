@@ -4,6 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 import pickle
 from scipy.stats import entropy
 import mediapipe as mp
+import os
 
 # MediaPipe Pose Estimation
 mp_pose = mp.solutions.pose
@@ -129,33 +130,36 @@ def save_model(model, filename):
 def load_model(filename):
     with open(filename, 'rb') as file:
         return pickle.load(file)
+    
+    
+def get_training_data(folder_path, ai_videos_folder=None):
+    training_data = []
+
+    # Gerçek videoların eklenmesi
+    for file in os.listdir(folder_path):
+        if file.endswith((".mp4", ".avi", ".mkv")):  # Video uzantılarını kontrol et
+            video_path = os.path.join(folder_path, file)
+            training_data.append({"path": video_path, "label": 0})  # Gerçek video etiketi
+
+    # AI videolarının eklenmesi (isteğe bağlı)
+    if ai_videos_folder:
+        for file in os.listdir(ai_videos_folder):
+            if file.endswith((".mp4", ".avi", ".mkv")):
+                video_path = os.path.join(ai_videos_folder, file)
+                training_data.append({"path": video_path, "label": 1})  # AI video etiketi
+
+    return training_data
+
 
 def main():
-    # Training dataset
-    training_data = [
-        {"path": "video_analysis/training_data/gerçek.mp4", "label": 0},
-        {"path": "video_analysis/training_data/gerçek2.mp4", "label": 0},
-        {"path": "video_analysis/training_data/babyCrawling.mp4", "label": 0},
-        {"path": "video_analysis/training_data/basketball.mp4", "label": 0},
-        {"path": "video_analysis/training_data/biking.mp4", "label": 0},
-        {"path": "video_analysis/training_data/blowDryHair.mp4", "label": 0},
-        {"path": "video_analysis/training_data/blowingCandle.mp4", "label": 0},
-        {"path": "video_analysis/training_data/headMasage.mp4", "label": 0},
-        {"path": "video_analysis/training_data/hulahoop.mp4", "label": 0},
-        {"path": "video_analysis/training_data/ai video.mp4", "label": 1},
-        {"path": "video_analysis/training_data/aiBabyCrawling.mp4", "label": 1},
-        {"path": "video_analysis/training_data/aiBasketball.mp4", "label": 1},
-        {"path": "video_analysis/training_data/aiBlowDryHair.mp4", "label": 1},
-        {"path": "video_analysis/training_data/aiBlowingCandle.mp4", "label": 1},
-        {"path": "video_analysis/training_data/aiHeadMasage.mp4", "label": 1},
-        {"path": "video_analysis/training_data/aiHulahoop.mp4", "label": 1},
-        {"path": "video_analysis/training_data/aivideo2.mp4", "label": 1},
-        {"path": "video_analysis/training_data/aivideo3.mp4", "label": 1},
-        {"path": "video_analysis/training_data/aivideo5.mp4", "label": 1},
+    # Gerçek ve AI videolarının bulunduğu klasörler
+    real_videos_folder = r"C:\Users\EXCALIBUR\Documents\GitHub\ai-video-detection\backend\video_analysis\training_data\real"
+    ai_videos_folder = r"C:\Users\EXCALIBUR\Documents\GitHub\ai-video-detection\backend\video_analysis\training_data\ai"
 
+    # Eğitim veri setini otomatik olarak oluştur
+    training_data = get_training_data(real_videos_folder, ai_videos_folder)
 
-    ]
-
+    # Eğitim ve etiketler
     X, y = [], []
     for video in training_data:
         features = extract_features(video["path"])
@@ -163,13 +167,14 @@ def main():
             X.append(features)
             y.append(video["label"])
 
+    # Model eğitimi ve kaydedilmesi
     model = train_model(X, y)
     save_model(model, "video_classification_model.pkl")
     print("Model trained and saved.")
 
     # Test
     model = load_model("video_classification_model.pkl")
-    test_video_path = "videos/aivideo2.mp4"
+    test_video_path = r"C:\Users\EXCALIBUR\Documents\GitHub\ai-video-detection\backend\video_analysis\test_data\aiHeadMasage.mp4"
     test_features = extract_features(test_video_path)
     if test_features:
         prediction = model.predict([test_features])[0]
