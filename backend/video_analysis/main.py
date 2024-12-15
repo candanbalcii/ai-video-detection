@@ -13,8 +13,8 @@ def main():
         print("Model loaded from disk.")
     else:
         # Eğitim verilerini al
-        real_videos_folder = r"C:\Users\EXCALIBUR\Documents\GitHub\ai-video-detection\backend\video_analysis\training_data\real"
-        ai_videos_folder = r"C:\Users\EXCALIBUR\Documents\GitHub\ai-video-detection\backend\video_analysis\training_data\ai"
+        real_videos_folder = r"C:\Users\canda\ai-video-detection\backend\video_analysis\training_data\ai"
+        ai_videos_folder = r"C:\Users\canda\ai-video-detection\backend\video_analysis\training_data\real"
 
         # Eğitim veri setini otomatik olarak oluştur
         training_data = get_training_data(real_videos_folder, ai_videos_folder)
@@ -32,14 +32,13 @@ def main():
         print("Model trained and saved.")
 
     # Test
-    test_video_path = r"C:\Users\EXCALIBUR\Documents\GitHub\ai-video-detection\backend\video_analysis\test_data\aiBlowDryHair.mp4"
+    test_video_path = r"C:\Users\canda\ai-video-detection\backend\video_analysis\test_data\aiAppliyngLipstick.mp4"
     test_features = extract_features(test_video_path)
 
     if test_features:
         # Modelin tahmin güvenini al
         prediction_probs = model.predict_proba([test_features])[0]
         ai_probability = prediction_probs[1]  # AI sınıfına ait olasılık
-        real_probability = prediction_probs[0]  # Real sınıfına ait olasılık
 
         # Motion özelliklerini çıkar ve varyansı hesapla
         frames = video_to_frames(test_video_path)
@@ -54,10 +53,10 @@ def main():
         final_score_percentage = final_score * 100
 
         # Tahmin sonucu ve skoru yazdır
-        if ai_probability > real_probability:
-            print(f"{test_video_path}: AI-generated video ({final_score_percentage:.2f}%)")
-        else:
-            print(f"{test_video_path}: Real video ({(100 - final_score_percentage):.2f}%)")
+        if ai_probability > 0.5:  # AI olma olasılığı %50'den fazla ise
+            print(f"{test_video_path}: AI video olma ihtimali yüksek ({final_score_percentage:.2f}%)")
+        else:  # AI olma olasılığı %50'den az ise
+            print(f"{test_video_path}: Gerçek video gibi görünüyor ({(100 - final_score_percentage):.2f}%)")
 
 
 if __name__ == "__main__":
