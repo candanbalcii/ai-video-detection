@@ -1,3 +1,5 @@
+#algortihms.py
+
 import cv2
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -117,6 +119,45 @@ def extract_features(video_path):
         entropy_mean, entropy_std,
         edge_mean, edge_std
     ] + pose_feats
+
+def validate_limbs(pose_landmarks):
+    """
+    Bir kişinin uzuv sayısını doğrular.
+    :param pose_landmarks: Mediapipe'den alınan pose landmarks verisi
+    :return: Kişi başına uzuv sayısına göre anormallik olup olmadığı
+    """
+    limb_counts = []
+    
+    # landmarks bir LandmarkList objesi ise, bunu doğrudan indeksleyebiliriz
+    # Eğer pose_landmarks, MediaPipe'nin `LandmarkList` objesiyse, aşağıdaki gibi erişim yapmalısınız
+    if isinstance(pose_landmarks, mp_pose.PoseLandmark):
+        # İlgili el ve dirsekleri kontrol et
+        right_hand = pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST]
+        left_hand = pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST]
+        right_elbow = pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ELBOW]
+        left_elbow = pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ELBOW]
+
+        # El ve dirseklerin görünürlük değerlerini kontrol et
+        limbs = sum([
+            right_hand.visibility > 0.5,  # Görünürlük > 0.5 ise tespit edilmiş kabul edilir
+            left_hand.visibility > 0.5,
+            right_elbow.visibility > 0.5,
+            left_elbow.visibility > 0.5,
+        ])
+
+        limb_counts.append(limbs)
+    
+    # Ortalama uzuv sayısını hesapla
+    mean_limbs_per_person = np.mean(limb_counts)
+    
+    # Anormallik kontrolü: Normalde 4 uzuv (2 el, 2 dirsek) beklenir
+    if mean_limbs_per_person < 2 or mean_limbs_per_person > 4:
+        return False  # Anormal bir durum
+    return True  # Normal
+
+
+
+
 
 def train_model(X, y):
     model = RandomForestClassifier(class_weight='balanced', random_state=42)
