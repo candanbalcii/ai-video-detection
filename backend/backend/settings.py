@@ -49,16 +49,17 @@ SIMPLE_JWT = {
 # Application definition
 
 INSTALLED_APPS = [
+    "api",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "api",
     "rest_framework",
     "corsheaders",
-]
+    'rest_framework_simplejwt',
+    ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -89,6 +90,8 @@ TEMPLATES = [
     },
 ]
 
+
+
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
@@ -96,15 +99,12 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PWD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 
 # Password validation
@@ -150,3 +150,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
+
+# Email settings (adjust with your SMTP provider)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.office365.com'  # Office 365 SMTP sunucusu
+EMAIL_PORT = 587  # SMTP portu (genellikle TLS için 587 kullanılır)
+EMAIL_USE_TLS = True  # Enable TLS (secure connection)
+EMAIL_HOST_USER = 'detectaiteam@outlook.com'  # Your email address
+EMAIL_HOST_PASSWORD = 'gokcencandan0201'  # Your email password
+DEFAULT_FROM_EMAIL = 'detectaiteam@outlook.com'  # Default email address
+
+SITE_URL = 'http://localhost:8000'  # Geliştirme ortamı
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
