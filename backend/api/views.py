@@ -17,6 +17,8 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from .serializers import UserProfileSerializer
 from rest_framework.views import APIView
+from .models import UserProfile  # Import the UserProfile model
+
 
 class NoteListCreate(generics.ListCreateAPIView):
     serializer_class = NoteSerializer
@@ -67,7 +69,32 @@ class CreateUserView(generics.CreateAPIView):
         # The serializer will handle the username logic, so no need for additional checks here.
         super().perform_create(serializer)
 
+class UpdateUserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def put(self, request, *args, **kwargs):
+        user = request.user
+        # Update user fields (e.g., first name, last name, email)
+        user.first_name = request.data.get('first_name', user.first_name)
+        user.last_name = request.data.get('last_name', user.last_name)
+        user.email = request.data.get('email', user.email)
+        user.save()
+
+        # Handle profile picture update
+        if 'profile_picture' in request.FILES:
+            profile_picture = request.FILES['profile_picture']
+            user_profile, created = UserProfile.objects.get_or_create(user=user)
+            user_profile.profile_picture = profile_picture
+            user_profile.save()
+
+        # Get the profile picture URL
+        profile_picture_url = user_profile.profile_picture.url if user_profile.profile_picture else None
+
+        return Response({
+            "message": "Profile updated successfully",
+            "profile_picture": profile_picture_url
+        }, status=status.HTTP_200_OK)
+    
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
@@ -87,6 +114,11 @@ class NoteDelete(generics.DestroyAPIView):
     def get_queryset(self):
         user = self.request.user 
         return Note.objects.filter(author=user )
+    
+class NoteListAll(generics.ListAPIView):
+    queryset = Note.objects.all()  # Tüm notları döndür
+    serializer_class = NoteSerializer
+    permission_classes = [AllowAny]  # Kimlik doğrulama gerektirme
     
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -112,9 +144,18 @@ class UserProfileView(APIView):
 
     def get(self, request):
         user = request.user
+        try:
+            user_profile = UserProfile.objects.get(user=user)  # UserProfile modelinden profili al
+            profile_picture_url = user_profile.profile_picture.url if user_profile.profile_picture else None
+        except UserProfile.DoesNotExist:
+            return Response({"error": "Profile does not exist."}, status=404)
+
         return Response({
             'username': user.username,
             'email': user.email,
             'first_name': user.first_name,
-            'last_name': user.last_name
+            'last_name': user.last_name,
+            'profile_picture': profile_picture_url,
         })
+    
+    

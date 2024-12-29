@@ -14,6 +14,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.http import urlsafe_base64_encode
 from django.urls import reverse
+from backend.video_analysis import process_video
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -63,11 +64,16 @@ def register_user(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+from rest_framework import serializers
+from .models import User  # Replace with your User model import
+from django.conf import settings
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(required=False)
+
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['first_name', 'last_name', 'email', 'profile_picture']
 
     def create(self, validated_data):
         validated_data['username'] = validated_data['email']
@@ -79,6 +85,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+    def to_representation(self, instance):
+        # Override the `to_representation` method to include the full URL of the profile picture
+        representation = super().to_representation(instance)
+        if instance.profile_picture:
+            # Ensure that the profile picture URL is accessible via the MEDIA_URL
+            representation['profile_picture'] = settings.MEDIA_URL + str(instance.profile_picture)
+        return representation
+
     
 
 class LoginSerializer(serializers.Serializer):
@@ -96,20 +111,39 @@ def login_user(request):
         return Response(serializer.errors, status=400)
 
 
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
 class NoteSerializer(serializers.ModelSerializer):
+    author_full_name = serializers.CharField(source='author.get_full_name', read_only=True)
+    author_profile_picture = serializers.ImageField(source='author.profile_picture', read_only=True)
+
+
     class Meta:
         model = Note
-        fields = ['id', 'title', 'content', 'created_at', 'author', 'video']
-        extra_kwargs = {'author': {'read_only': True}}
+        fields = ['id','created_at', 'author', 'video', 'score','author_full_name', 'author_profile_picture']
 
     def create(self, validated_data):
         video_file = validated_data.get('video')
-        # Save the note and handle file upload
+        # Create the Note instance with validated data
         note = Note.objects.create(**validated_data)
+        
         if video_file:
-            # Optionally, handle additional logic for the video file (e.g., storing or processing)
-            pass
+            # Save the video file to the default storage and get the file path
+            video_path = default_storage.save('media/videos/' + video_file.name, ContentFile(video_file.read()))
+            print(f"Video başarıyla kaydedildi: {video_path}")  # Dosya kaydedildi mi?
+            print(f"Video dosyasının URL'si: {video_path}")
+
+
+            # Process the video to get the classification score
+            score = process_video(video_path)  # Assume this function processes the video and returns the score
+            # Assign the classification score to the Note instance
+            note.score = score  # Ensure 'score' is the correct field name in the model
+            # Save the Note instance with the classification score
+            note.save()
+
         return note
+
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):

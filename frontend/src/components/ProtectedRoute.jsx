@@ -1,4 +1,3 @@
-//if we wrap something in protected rout then we need to have autherization token before well be able to actually access this route
 import { Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import api from '../api';
@@ -37,7 +36,7 @@ function ProtectedRoute({ children }) {
       return;
     }
     const decoded = jwtDecode(token);
-    const tokenExpiration = decoded.expconst;
+    const tokenExpiration = decoded.exp; // Corrected this line
     const now = Date.now() / 1000;
 
     if (tokenExpiration < now) {
@@ -48,7 +47,7 @@ function ProtectedRoute({ children }) {
   };
 
   if (isAuthorized === null) {
-    return <div> Loading... </div>;
+    return <div>Loading...</div>;
   }
 
   return isAuthorized ? children : <Navigate to="/login" />;
