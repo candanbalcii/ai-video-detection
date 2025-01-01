@@ -18,6 +18,9 @@ from django.contrib.auth.tokens import default_token_generator
 from .serializers import UserProfileSerializer
 from rest_framework.views import APIView
 from .models import UserProfile  # Import the UserProfile model
+import os
+from video_analysis import video_analysis
+
 
 
 class NoteListCreate(generics.ListCreateAPIView):
@@ -29,17 +32,10 @@ class NoteListCreate(generics.ListCreateAPIView):
         user = self.request.user
         return Note.objects.filter(author=user)
 
-    def perform_create(self, serializer):
-        # Perform the actual creation of a note with the authenticated user
-        if serializer.is_valid():
-            # Save the note with the current authenticated user as the author
-            serializer.save(author=self.request.user)
-        else:
-            print(serializer.errors)
-
+   
     def create(self, request, *args, **kwargs):
         """
-        Overriding the `create` method to handle video file upload.
+        Overriding the create method to handle video file upload.
         This ensures that the video file is correctly handled as part of the form data.
         """
         # Handling the incoming request as a multipart form-data (to support video upload)
@@ -157,5 +153,4 @@ class UserProfileView(APIView):
             'last_name': user.last_name,
             'profile_picture': profile_picture_url,
         })
-    
     

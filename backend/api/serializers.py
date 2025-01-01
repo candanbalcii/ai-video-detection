@@ -14,7 +14,19 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.http import urlsafe_base64_encode
 from django.urls import reverse
-from backend.video_analysis import process_video
+from video_analysis import video_analysis
+import os 
+from rest_framework import serializers
+from .models import User  # Replace with your User model import
+from django.conf import settings
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import ffmpeg
+from tempfile import NamedTemporaryFile
+import subprocess
+
+
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -64,10 +76,6 @@ def register_user(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-from rest_framework import serializers
-from .models import User  # Replace with your User model import
-from django.conf import settings
-
 class UserProfileSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(required=False)
 
@@ -87,7 +95,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return user
 
     def to_representation(self, instance):
-        # Override the `to_representation` method to include the full URL of the profile picture
+        # Override the to_representation method to include the full URL of the profile picture
         representation = super().to_representation(instance)
         if instance.profile_picture:
             # Ensure that the profile picture URL is accessible via the MEDIA_URL
@@ -95,7 +103,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return representation
 
     
-
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
@@ -110,42 +117,74 @@ def login_user(request):
         # Hata mesajını dön
         return Response(serializer.errors, status=400)
 
-
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-
 class NoteSerializer(serializers.ModelSerializer):
     author_full_name = serializers.CharField(source='author.get_full_name', read_only=True)
     author_profile_picture = serializers.ImageField(source='author.profile_picture', read_only=True)
 
-
     class Meta:
         model = Note
-        fields = ['id','created_at', 'author', 'video', 'score','author_full_name', 'author_profile_picture']
+        fields = ['id', 'created_at', 'author', 'video', 'score', 'author_full_name', 'author_profile_picture']
 
     def create(self, validated_data):
         video_file = validated_data.get('video')
+
+        # Check if video is valid using ffmpeg
+        if video_file:
+            try:
+                # Save the video to a temporary file first to check its validity with ffmpeg
+                with NamedTemporaryFile(delete=False) as temp_file:
+                    temp_file.write(video_file.read())
+                    temp_file.close()
+                    
+                    # Validate the video file with ffmpeg
+                    ffmpeg.probe(temp_file.name)  # Check if the video is valid
+                
+                # Move the moov atom to the start of the video file using ffmpeg
+                temp_video_path = temp_file.name  # Temporary path of the video
+                output_video_path = os.path.join(settings.MEDIA_ROOT, 'fixed_' + video_file.name)  # New path for fixed video
+
+                # Run ffmpeg to move the moov atom to the start
+                subprocess.run(['ffmpeg', '-i', temp_video_path, '-movflags', 'faststart', output_video_path], check=True)
+
+                # Open the fixed video file
+                with open(output_video_path, 'rb') as f:
+                    video_file_content = f.read()
+
+                # Save fixed video to storage
+                video_path = default_storage.save('media/videos/' + 'fixed_' + video_file.name, ContentFile(video_file_content))
+                absolute_video_path = os.path.join(settings.MEDIA_ROOT, video_path)
+                print(f"Video başarıyla kaydedildi: {absolute_video_path}")
+                print(f"Video dosyasının URL'si: {video_path}")
+                print(f"Video dosyasının tam yolu: {absolute_video_path}")
+                
+                # Generate the URL accessible from frontend
+                video_url = settings.MEDIA_URL + 'videos/' + 'fixed_' + video_file.name
+
+            except ffmpeg.Error as e:
+                # Handle ffmpeg errors
+                if "moov atom not found" in str(e.stderr):
+                    raise serializers.ValidationError("Video dosyası bozuk veya eksik. Lütfen geçerli bir video yükleyin.")
+                else:
+                    raise serializers.ValidationError("Video dosyası geçerli değil veya başka bir hata oluştu.")
+
         # Create the Note instance with validated data
         note = Note.objects.create(**validated_data)
-        
+
+        # Save the video URL to the note
         if video_file:
-            # Save the video file to the default storage and get the file path
-            video_path = default_storage.save('media/videos/' + video_file.name, ContentFile(video_file.read()))
-            print(f"Video başarıyla kaydedildi: {video_path}")  # Dosya kaydedildi mi?
-            print(f"Video dosyasının URL'si: {video_path}")
+            note.video_url = video_url
+            note.save()
 
-
-            # Process the video to get the classification score
-            score = process_video(video_path)  # Assume this function processes the video and returns the score
-            # Assign the classification score to the Note instance
-            note.score = score  # Ensure 'score' is the correct field name in the model
-            # Save the Note instance with the classification score
+            # Calculate the video score and save it to the Note instance
+            final_score = video_analysis(absolute_video_path)
+            note.score = final_score
             note.save()
 
         return note
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    
     def validate(self, attrs):
         email = attrs.get("email", None)
         if email:
