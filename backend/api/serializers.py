@@ -167,8 +167,12 @@ class NoteSerializer(serializers.ModelSerializer):
                 else:
                     raise serializers.ValidationError("Video dosyası geçerli değil veya başka bir hata oluştu.")
 
-        # Create the Note instance with validated data
+        else:
+         video_url = None
+         absolute_video_path = None
+
         note = Note.objects.create(**validated_data)
+
 
         # Save the video URL to the note
         if video_file:
@@ -177,16 +181,50 @@ class NoteSerializer(serializers.ModelSerializer):
 
             # Calculate the video score and save it to the Note instance
             final_score = video_analysis(absolute_video_path)
+            print(f"Video Analiz Sonucu: {final_score}")
+
             note.score = final_score
             note.save()
 
         return note
+    
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    
     def validate(self, attrs):
         email = attrs.get("email", None)
         if email:
             attrs["username"] = email  # JWT, username alanını arar, email'e yönlendirin
         return super().validate(attrs)
+
+@api_view(['POST'])
+def login_user(request):
+    serializer = LoginSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        # Giriş başarılıysa, kullanıcıyı alın
+        email = serializer.validated_data['email']
+        user = User.objects.get(email=email)  # Kullanıcıyı veritabanından alın
+        
+        # Token'ları alın
+        tokens = get_tokens_for_user(user)
+        
+        # Token'ları ve kullanıcı bilgilerini döndürün
+        return Response({
+            'access_token': tokens['access'],
+            'refresh_token': tokens['refresh'],
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                # İhtiyacınıza göre diğer kullanıcı bilgilerini buraya ekleyebilirsiniz
+            }
+        }, status=200)
+    
+    else:
+        return Response(serializer.errors, status=400)

@@ -1,9 +1,11 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from api.views import CreateUserView, verify_email, UserProfileView
+from api.views import CreateUserView, verify_email, UserProfileView,UpdateUserProfileView
 from django.conf import settings
 from django.conf.urls.static import static
+from api.views import NoteListAll  # NoteListAll'ı import ediyoruz
+
 
 
 urlpatterns = [
@@ -14,6 +16,9 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     path("api/", include("api.urls")),
     path('api/profile/', UserProfileView.as_view(), name='profile_view'),  # Updated this line
+    path('api/notes/all/', NoteListAll.as_view(), name='note-list-all'),
+    path('api/profile/update/', UpdateUserProfileView.as_view(), name='update_profile'),
+
 
     # E-posta doğrulama URL'si
     path("api/verify-email/<uidb64>/<token>/", verify_email, name="verify_email"),

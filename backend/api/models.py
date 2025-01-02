@@ -7,7 +7,7 @@ class Note(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notes")
     video = models.FileField(upload_to='videos/', null=True, blank=True)  # Video upload field
-    score = models.IntegerField(null=True, blank=True)
+    score = models.FloatField(null=True, blank=True)
 
 
     def __str__(self):

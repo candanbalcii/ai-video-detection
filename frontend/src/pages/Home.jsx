@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Typography, Button, Box, Grid } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   return (
@@ -46,22 +47,49 @@ const Home = () => {
                 lineHeight: '1.6',
               }}
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at
-              ipsum vitae lacus lobortis lacinia. Donec tristique arcu massa, at
-              pharetra tortor feugiat non.
+              DetectAI is a reliable platform designed to detect AI-generated
+              fake videos. It aims to help individuals and media professionals
+              quickly identify misleading content, promoting trust in online
+              information and raising awareness about digital security.
             </Typography>
-            <Button
-              variant="contained"
-              style={{
-                backgroundColor: '#4B0082',
-                color: '#FFF',
-                padding: '10px 20px',
-              }}
-            >
-              Learn More
-            </Button>
+            <Box style={{ display: 'flex', gap: '15px' }}>
+              {/* Signup Butonu */}
+              <Button
+                variant="contained"
+                style={{
+                  backgroundColor: '#4B0082',
+                  color: '#FFF',
+                  padding: '10px 20px',
+                  marginBottom: '20px', // Butonun altına boşluk ekledik
+                  width: '150px', // Genişlik ayarlandı
+                  height: '50px', // Yükseklik ayarlandı
+                }}
+                component={Link}
+                to="/signup"
+              >
+                Signup
+              </Button>
+
+              {/* Login Butonu */}
+              <Button
+                sx={{}}
+                variant="outlined"
+                color="secondary"
+                style={{
+                  color: '#4B0082',
+                  borderColor: '#4B0082',
+                  width: '150px', // Genişlik ayarlandı
+                  height: '50px', // Yükseklik ayarlandı
+                }}
+                component={Link}
+                to="/login"
+              >
+                Login
+              </Button>
+            </Box>
           </Grid>
-          {/*Resim sağ tarafta*/}
+
+          {/* Resim sağ tarafta */}
           <Grid
             item
             xs={12}
@@ -96,7 +124,7 @@ const Home = () => {
                 alt="AI Illustration Right"
                 style={{
                   width: '50%',
-                  maxWidth: '200px',
+                  maxWidth: '150px',
                   borderRadius: '70px',
                   margin: '0',
                 }}

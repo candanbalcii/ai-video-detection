@@ -1,62 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, Grid, TextField, Typography, Paper } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  Paper,
+  CircularProgress,
+} from '@mui/material';
 import { useDropzone } from 'react-dropzone';
 import api from '../api';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
-  const [notes, setNotes] = useState([]);
   const [video, setVideo] = useState(null);
+  const [score, setScore] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [loading, setLoading] = useState(false); // Added loading state
 
-  useEffect(() => {
-    getNotes();
-  }, []);
-
-  const getNotes = () => {
-    api
-      .get('/api/notes/')
-      .then((res) => res.data)
-      .then((data) => {
-        setNotes(data);
-        console.log(data);
-      })
-      .catch((err) => alert(err));
-  };
-
-  const createNote = (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    if (video) {
-      formData.append('video', video);
-    }
-
-    api
-      .post('/api/notes/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then((res) => {
-        if (res.status === 201) {
-          alert('Note created!');
-          getNotes();
-        } else {
-          alert('Failed to make note.');
-        }
-      })
-      .catch((err) => alert(err));
-  };
+  const navigate = useNavigate();
 
   const onDrop = (acceptedFiles) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0];
 
-      // MIME türünü kontrol et
       if (!file.type.startsWith('video/')) {
         alert('Yüklenen dosya bir video değil!');
         return;
       }
 
-      // Uzantıyı kontrol et (isteğe bağlı)
       const validExtensions = ['mp4', 'avi', 'mov', 'mkv'];
       const fileExtension = file.name.split('.').pop().toLowerCase();
       if (!validExtensions.includes(fileExtension)) {
@@ -68,7 +39,6 @@ function Home() {
         return;
       }
 
-      // Eğer tüm kontroller geçilirse, video dosyasını kaydet
       setVideo(file);
       alert(`Video "${file.name}" başarıyla seçildi!`);
     }
@@ -78,6 +48,38 @@ function Home() {
     onDrop,
     accept: 'video/*',
   });
+
+  const createNote = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    if (video) {
+      formData.append('video', video);
+    }
+
+    setLoading(true); // Set loading to true when submitting
+
+    api
+      .post('/api/notes/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      .then((res) => {
+        if (res.status === 201) {
+          const videoScore = res.data.score;
+          setScore(videoScore);
+          setVideoUrl(res.data.video_url);
+          alert('Note created!');
+          navigate('/score', {
+            state: { videoUrl: res.data.video_url, score: videoScore },
+          });
+        } else {
+          alert('Failed to make note.');
+        }
+      })
+      .catch((err) => alert(err))
+      .finally(() => setLoading(false)); // Set loading to false when done
+  };
 
   return (
     <Grid
@@ -111,7 +113,7 @@ function Home() {
             Detect AI Generated Videos
           </Typography>
           <Typography variant="body1" sx={{ color: '#555' }}>
-            Upload your video and get a confidence score
+            Upload your video and get a score
           </Typography>
         </Box>
         <form onSubmit={createNote}>
@@ -151,9 +153,22 @@ function Home() {
               '&:hover': { backgroundColor: '#6A0DAD' },
             }}
           >
-            Submit Note
+            Submit
           </Button>
         </form>
+
+        {/* Show the loading spinner while the video is being processed */}
+        {loading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 3 }}>
+            <CircularProgress sx={{ color: '#4B0082' }} />
+          </Box>
+        )}
+
+        {score && (
+          <Typography variant="h6" sx={{ marginTop: 3, color: '#4B0082' }}>
+            Score: {score}%
+          </Typography>
+        )}
       </Grid>
     </Grid>
   );

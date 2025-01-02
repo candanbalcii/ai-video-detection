@@ -163,7 +163,7 @@ function Profile() {
                     }}
                     fullWidth
                   >
-                    Notu Sil
+                    Delete{' '}
                   </Button>
                 </CardContent>
               </Card>

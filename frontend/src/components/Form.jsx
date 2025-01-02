@@ -142,7 +142,18 @@ function Form({ method }) {
                 margin="normal"
                 error={!!error}
                 helperText={error && 'First name is required'}
-                sx={{ color: '#fff', borderColor: '#fff' }}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    backgroundColor: 'white', // Arka plan beyaz
+                    color: 'black', // Yazı rengi siyah
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    borderColor: 'white', // Kenarlık beyaz
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: 'gray', // Etiket beyaz
+                  },
+                }}
               />
 
               {/* Last Name Input */}
@@ -155,6 +166,18 @@ function Form({ method }) {
                 margin="normal"
                 error={!!error}
                 helperText={error && 'Last name is required'}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    backgroundColor: 'white', // Arka plan beyaz
+                    color: 'black', // Yazı rengi siyah
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    borderColor: 'white', // Kenarlık beyaz
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: 'gray', // Etiket beyaz
+                  },
+                }}
               />
             </>
           )}
@@ -170,6 +193,18 @@ function Form({ method }) {
             margin="normal"
             error={!!error}
             helperText={error && 'Email is required'}
+            sx={{
+              '& .MuiInputBase-root': {
+                backgroundColor: 'white', // Arka plan beyaz
+                color: 'black', // Yazı rengi siyah
+              },
+              '& .MuiOutlinedInput-root': {
+                borderColor: 'white', // Kenarlık beyaz
+              },
+              '& .MuiInputLabel-root': {
+                color: 'gray', // Etiket beyaz
+              },
+            }}
           />
 
           {/* Password Input */}
@@ -183,6 +218,18 @@ function Form({ method }) {
             margin="normal"
             error={!!error}
             helperText={error && 'Password is required'}
+            sx={{
+              '& .MuiInputBase-root': {
+                backgroundColor: 'white', // Arka plan beyaz
+                color: 'black', // Yazı rengi siyah
+              },
+              '& .MuiOutlinedInput-root': {
+                borderColor: 'white', // Kenarlık beyaz
+              },
+              '& .MuiInputLabel-root': {
+                color: 'gray', // Etiket beyaz
+              },
+            }}
           />
 
           {error && (
@@ -200,7 +247,7 @@ function Form({ method }) {
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ marginTop: 2, backgroundColor: '#355C7D' }}
+            sx={{ marginTop: 2, backgroundColor: '#4B0082' }}
             disabled={loading}
           >
             {name}

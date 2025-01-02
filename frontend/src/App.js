@@ -8,8 +8,15 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import WelcomePage from './pages/Home';
 import NotFound from './pages/NotFound';
+import VideoUpload from './pages/VideoUpload';
+import ContactUs from './pages/ContactUs';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
+import Score from './pages/Score';
 
 function Logout() {
   localStorage.clear();
@@ -27,19 +34,64 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
+        <Route path="/" element={<WelcomePage />} />
+
         <Route
-          path="/"
+          path="/upload"
           element={
             <ProtectedRoute>
-              <WelcomePage />
+              <VideoUpload />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/score"
+          element={
+            <ProtectedRoute>
+              <Score />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/contact-us"
+          element={
+            <ProtectedRoute>
+              <ContactUs />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-profile"
+          element={
+            <ProtectedRoute>
+              <EditProfile />
             </ProtectedRoute>
           }
         />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/signup" element={<RegisterAndLogout />} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }

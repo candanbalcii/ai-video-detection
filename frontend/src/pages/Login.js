@@ -32,107 +32,107 @@
 // //     }, 1000); // Simulate network delay
 // //   };
 
-// //   return (
-// //     <Grid
-// //       container
-// //       sx={{
-// //         display: 'flex',
-// //         justifyContent: 'center',
-// //         background: 'linear-gradient(90deg, #000, #4B0082)', // Arka plan degrade
-// //         minHeight: '100vh', // Tam ekran yüksekliği
-// //         alignItems: 'center', // Dikeyde ortalama
-// //       }}
-// //     >
-// //       {/* Form bölümü */}
-// //       <Grid
-// //         item
-// //         xs={12}
-// //         sm={7}
-// //         md={5}
-// //         sx={{
-// //           padding: 3,
-// //           background: 'transparent', // Çevreleyen kutuyu kaldırdık
-// //           borderRadius: '0', // Köşe yuvarlama kaldırıldı
-// //           color: '#fff', // Yazı rengini beyaz yaptık
-// //           marginBottom: '150px', // Formu yukarıya çekmek için margin ekledik
-// //         }}
-// //       >
-// //         <Box sx={{ textAlign: 'center' }}>
-// //           <Typography variant="h2" gutterBottom>
-// //             Welcome!
-// //           </Typography>
-// //           <Typography variant="h6" gutterBottom>
-// //             Don't have an account yet?{' '}
-// //             <Link
-// //               href="/signup"
-// //               variant="body2"
-// //               sx={{
-// //                 textDecoration: 'none',
-// //                 color: '#355C7D',
-// //               }}
-// //             >
-// //               Sign Up
-// //             </Link>
-// //           </Typography>
-// //         </Box>
+//   return (
+//     <Grid
+//       container
+//       sx={{
+//         display: 'flex',
+//         justifyContent: 'center',
+//         background: 'linear-gradient(90deg, #000, #4B0082)', // Arka plan degrade
+//         minHeight: '100vh', // Tam ekran yüksekliği
+//         alignItems: 'center', // Dikeyde ortalama
+//       }}
+//     >
+//       {/* Form bölümü */}
+//       <Grid
+//         item
+//         xs={12}
+//         sm={7}
+//         md={5}
+//         sx={{
+//           padding: 3,
+//           background: 'transparent', // Çevreleyen kutuyu kaldırdık
+//           borderRadius: '0', // Köşe yuvarlama kaldırıldı
+//           color: '#fff', // Yazı rengini beyaz yaptık
+//           marginBottom: '150px', // Formu yukarıya çekmek için margin ekledik
+//         }}
+//       >
+//         <Box sx={{ textAlign: 'center' }}>
+//           <Typography variant="h2" gutterBottom>
+//             Welcome!
+//           </Typography>
+//           <Typography variant="h6" gutterBottom>
+//             Don't have an account yet?{' '}
+//             <Link
+//               href="/signup"
+//               variant="body2"
+//               sx={{
+//                 textDecoration: 'none',
+//                 color: '#355C7D',
+//               }}
+//             >
+//               Sign Up
+//             </Link>
+//           </Typography>
+//         </Box>
 
-// //         <Formik
-// //           initialValues={{ email: '', password: '', keepLoggedIn: false }}
-// //           validationSchema={loginSchema}
-// //           onSubmit={handleSubmit}
-// //         >
-// //           {({ values, handleChange, errors, touched, isSubmitting }) => (
-// //             <Form>
-// //               {/* Email Input */}
-// //               <FormInput
-// //                 label="Email"
-// //                 name="email"
-// //                 value={values.email}
-// //                 onChange={handleChange}
-// //                 error={touched.email && Boolean(errors.email)}
-// //                 helperText={touched.email && errors.email}
-// //               />
-// //               {/* Password Input */}
-// //               <FormInput
-// //                 label="Password"
-// //                 name="password"
-// //                 type="password"
-// //                 value={values.password}
-// //                 required
-// //                 onChange={handleChange}
-// //                 error={touched.password && Boolean(errors.password)}
-// //                 helperText={touched.password && errors.password}
-// //               />
-// //               <Box
-// //                 sx={{
-// //                   display: 'flex',
-// //                   justifyContent: 'space-between',
-// //                   alignItems: 'center',
-// //                 }}
-// //               >
-// //                 <FormControlLabel
-// //                   control={
-// //                     <Checkbox
-// //                       name="keepLoggedIn"
-// //                       checked={values.keepLoggedIn}
-// //                       onChange={handleChange}
-// //                       color="primary"
-// //                     />
-// //                   }
-// //                   label="Keep me logged in"
-// //                 />
-// //                 <Link href="#" variant="body2" sx={{ color: '#355C7D' }}>
-// //                   Forgot password?
-// //                 </Link>
-// //               </Box>
-// //               <SubmitButton text="Login" disabled={isSubmitting} />
-// //             </Form>
-// //           )}
-// //         </Formik>
-// //       </Grid>
-// //     </Grid>
-// //   );
-// // };
+//         <Formik
+//           initialValues={{ email: '', password: '', keepLoggedIn: false }}
+//           validationSchema={loginSchema}
+//           onSubmit={handleSubmit}
+//         >
+//           {({ values, handleChange, errors, touched, isSubmitting }) => (
+//             <Form>
+//               {/* Email Input */}
+//               <FormInput
+//                 label="Email"
+//                 name="email"
+//                 value={values.email}
+//                 onChange={handleChange}
+//                 error={touched.email && Boolean(errors.email)}
+//                 helperText={touched.email && errors.email}
+//               />
+//               {/* Password Input */}
+//               <FormInput
+//                 label="Password"
+//                 name="password"
+//                 type="password"
+//                 value={values.password}
+//                 required
+//                 onChange={handleChange}
+//                 error={touched.password && Boolean(errors.password)}
+//                 helperText={touched.password && errors.password}
+//               />
+//               <Box
+//                 sx={{
+//                   display: 'flex',
+//                   justifyContent: 'space-between',
+//                   alignItems: 'center',
+//                 }}
+//               >
+//                 <FormControlLabel
+//                   control={
+//                     <Checkbox
+//                       name="keepLoggedIn"
+//                       checked={values.keepLoggedIn}
+//                       onChange={handleChange}
+//                       color="primary"
+//                     />
+//                   }
+//                   label="Keep me logged in"
+//                 />
+//                 <Link href="#" variant="body2" sx={{ color: '#355C7D' }}>
+//                   Forgot password?
+//                 </Link>
+//               </Box>
+//               <SubmitButton text="Login" disabled={isSubmitting} />
+//             </Form>
+//           )}
+//         </Formik>
+//       </Grid>
+//     </Grid>
+//   );
+// };
 
 // // export default Login;
 // import Form from '../components/Form';

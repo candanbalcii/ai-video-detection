@@ -14,6 +14,8 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
+from celery import Celery
+
 
 load_dotenv()
 
@@ -163,4 +165,17 @@ DEFAULT_FROM_EMAIL = 'detectaiteam@outlook.com'  # Default email address
 SITE_URL = 'http://localhost:8000'  # Geliştirme ortamı
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT= os.path.join(os.path.dirname(BASE_DIR), "media_root")
+
+# Celery ayarlarını ekliyoruz
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis kullanıyorsanız
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Sonuçları Redis'te saklamak için
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+# Celery uygulamasını başlatıyoruz
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+
+celery_app = Celery('ai_video_detection')
+celery_app.config_from_object('django.conf:settings', namespace='CELERY')
+celery_app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
