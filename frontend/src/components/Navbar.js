@@ -10,38 +10,13 @@ import {
   Box,
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
+import { ACCESS_TOKEN } from '../constants';
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      setIsLoggedIn(true);
-      fetchUserProfile(token);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, []);
-
-  const fetchUserProfile = (token) => {
-    fetch('/api/user/profile', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setUser(data);
-      })
-      .catch((error) => {
-        console.error('Error fetching user profile:', error);
-        setIsLoggedIn(false);
-      });
-  };
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -52,12 +27,65 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('access_token');
+    console.log('Logging out...');
+    localStorage.removeItem(ACCESS_TOKEN); // Tokeni temizle
     setIsLoggedIn(false);
     setUser(null);
     navigate('/login');
     handleCloseMenu();
   };
+
+  const fetchUserData = (token) => {
+    fetch('http://localhost:8000/api/profile/', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('User data fetched:', data);
+        setUser({
+          email: data.email,
+          profile_image:
+            data.profile_picture || 'https://via.placeholder.com/40',
+        });
+      })
+      .catch((error) => {
+        console.error('Error fetching user data:', error);
+        setIsLoggedIn(false);
+      });
+  };
+
+  // Sayfa yüklendiğinde token'i kontrol et
+  useEffect(() => {
+    const storedToken = localStorage.getItem(ACCESS_TOKEN);
+
+    if (storedToken) {
+      setIsLoggedIn(true);
+      fetchUserData(storedToken); // Token varsa kullanıcı verisini al
+    } else {
+      setIsLoggedIn(false);
+      setUser(null); // Eğer token yoksa, kullanıcıyı çıkart
+    }
+  }, []); // Sayfa yüklendiğinde sadece bir kez çalışır
+
+  // Kullanıcı login olduğunda avatar'ı güncellemek için
+  useEffect(() => {
+    if (isLoggedIn && user === null) {
+      const storedToken = localStorage.getItem(ACCESS_TOKEN);
+      if (storedToken) {
+        fetchUserData(storedToken); // Login olduktan sonra avatar hemen görünsün
+      }
+    }
+  }, [isLoggedIn, user]); // Kullanıcı login olursa, avatar'ı al
+
+  // Yönlendirme sonrası avatar'ı göster
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      navigate('/upload'); // Login olduktan sonra upload sayfasına yönlendir
+    }
+  }, [isLoggedIn, user, navigate]); // `isLoggedIn` veya `user` güncellenirse, yönlendir
 
   return (
     <AppBar
@@ -106,9 +134,7 @@ const Navbar = () => {
           </Button>
         </Box>
 
-        {!isLoggedIn ? (
-          <></>
-        ) : (
+        {isLoggedIn ? (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Avatar
               sx={{ margin: '10px', padding: '10px', cursor: 'pointer' }}
@@ -131,7 +157,7 @@ const Navbar = () => {
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </div>
-        )}
+        ) : null}
       </Toolbar>
     </AppBar>
   );
