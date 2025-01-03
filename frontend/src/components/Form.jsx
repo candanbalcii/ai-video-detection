@@ -41,8 +41,19 @@ function Form({ method }) {
       if (method === 'register') {
         navigate('/login'); // Kayıt sonrası login sayfasına yönlendir
       } else {
+        // Token'ları kaydettikten sonra hemen kontrol edin
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
+
+        // Sonra hemen kaydedilen veriyi alıp kontrol edin
+        console.log(
+          'Stored Access Tokennnnn: ',
+          localStorage.getItem(ACCESS_TOKEN)
+        );
+        console.log(
+          'Stored Refresh Tokennnnn: ',
+          localStorage.getItem(REFRESH_TOKEN)
+        );
         navigate('/upload'); // Login sonrası upload sayfasına yönlendir
       }
     } catch (error) {

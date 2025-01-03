@@ -39,11 +39,16 @@ def video_analysis(video_path):
     # Eğer model kaydedilmişse, yükle
     if os.path.exists(model_filename):
         model = load_model(model_filename)
+        print("Model zaten kaydedilmiş")
+
+
     else:
         # Eğitim verileriyle modeli oluştur
         real_videos_folder = r"C:\\Users\\canda\\ai-video-detection\\backend\\data\\training_data\\real"
         ai_videos_folder = r"C:\\Users\\canda\\ai-video-detection\\backend\\data\\training_data\\ai"
         training_data = get_training_data(real_videos_folder, ai_videos_folder)
+        print("Model yeniden eğitiliyor")
+
 
         X, y = [], []
         for video in training_data:

@@ -24,6 +24,8 @@ from django.core.files.base import ContentFile
 import ffmpeg
 from tempfile import NamedTemporaryFile
 import subprocess
+from django.contrib.auth import authenticate
+
 
 
 
@@ -101,6 +103,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             # Ensure that the profile picture URL is accessible via the MEDIA_URL
             representation['profile_picture'] = settings.MEDIA_URL + str(instance.profile_picture)
         return representation
+
 
     
 class LoginSerializer(serializers.Serializer):
@@ -208,23 +211,28 @@ def login_user(request):
     serializer = LoginSerializer(data=request.data)
     
     if serializer.is_valid():
-        # Giriş başarılıysa, kullanıcıyı alın
         email = serializer.validated_data['email']
-        user = User.objects.get(email=email)  # Kullanıcıyı veritabanından alın
+        password = serializer.validated_data['password']
         
-        # Token'ları alın
-        tokens = get_tokens_for_user(user)
+        # Kullanıcıyı authenticate et
+        user = authenticate(request, username=email, password=password)
         
-        # Token'ları ve kullanıcı bilgilerini döndürün
-        return Response({
-            'access_token': tokens['access'],
-            'refresh_token': tokens['refresh'],
-            'user': {
-                'id': user.id,
-                'email': user.email,
-                # İhtiyacınıza göre diğer kullanıcı bilgilerini buraya ekleyebilirsiniz
-            }
-        }, status=200)
+        if user is not None:
+            # Token'ları al
+            tokens = get_tokens_for_user(user)
+            
+            # Başarılı giriş yanıtı
+            return Response({
+                'access_token': tokens['access'],
+                'refresh_token': tokens['refresh'],
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                }
+            }, status=200)
+        else:
+            # Kimlik doğrulama başarısızsa hata mesajı
+            return Response({'detail': 'Invalid credentials'}, status=401)
     
-    else:
-        return Response(serializer.errors, status=400)
+    # Serializer geçerli değilse hata mesajı döndür
+    return Response(serializer.errors, status=400)

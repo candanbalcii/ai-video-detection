@@ -31,7 +31,7 @@ function Score() {
   return (
     <Box sx={{ padding: 4, textAlign: 'center' }}>
       <Typography variant="h4" sx={{ marginBottom: 2 }}>
-        Video Confidence Score
+        Video Score
       </Typography>
       <Typography variant="h6" sx={{ marginBottom: 3 }}>
         Score: {score}%
