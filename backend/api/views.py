@@ -62,8 +62,14 @@ class CreateUserView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
-        # The serializer will handle the username logic, so no need for additional checks here.
-        super().perform_create(serializer)
+        # Kullanıcıyı oluştur
+        user = serializer.save()
+        
+        # Kullanıcı için bir UserProfile oluştur
+        UserProfile.objects.create(user=user)
+
+        # Gerekirse, başka başlangıç işlemleri yapılabilir
+
 
 class UpdateUserProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -120,20 +126,44 @@ class NoteListAll(generics.ListAPIView):
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+@api_view(['POST'])
+def register_user(request):
+    serializer = UserSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        # Kullanıcıyı kaydet ancak aktif etme
+        user = serializer.save(is_active=False)
 
-def verify_email(request, uidb64, token):
-    try:
-        uid = urlsafe_base64_decode(uidb64).decode()
-        user = get_user_model().objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, user.DoesNotExist):
-        raise Http404("Invalid verification link")
+        # Kullanıcı için UID ve Token oluştur
+        uid = urlsafe_base64_encode(force_bytes(user.pk))  # User ID encoded
+        token = default_token_generator.make_token(user)  # Token generation
 
-    if default_token_generator.check_token(user, token):
-        user.is_active = True  # Kullanıcıyı aktif et
-        user.save()
-        return Response({"message": "Email successfully verified!"}, status=status.HTTP_200_OK)
-    else:
-        return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+        # Doğrulama URL'si oluştur
+        verification_url = reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
+        full_url = f'{settings.SITE_URL}{verification_url}'
+
+        # HTML e-posta içeriği
+        subject = 'Email Verification'
+        message = render_to_string('account/verification_email.html', {
+            'user': user,
+            'verification_url': full_url,
+        })
+
+        # E-posta gönderme
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=False,
+        )
+
+        return Response(
+            {"message": "Registration successful. Please check your email to verify your account."},
+            status=status.HTTP_201_CREATED,
+        )
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
