@@ -6,21 +6,17 @@ import {
   Card,
   CardContent,
   Avatar,
-  Button,
   Tabs,
   Tab,
   Divider,
-  AppBar,
-  Toolbar,
 } from '@mui/material';
 import api from '../api';
-import { formatDistanceToNow } from 'date-fns'; // formatDistanceToNow fonksiyonu
-import { enUS } from 'date-fns/locale'; // İngilizce dil desteği
+import { formatDistanceToNow } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 
 function Dashboard() {
   const [notes, setNotes] = useState([]);
-  const [selectedTab, setSelectedTab] = useState(0); // 0: Articles, 1: Videos
-  const [video, setVideo] = useState(null);
+  const [selectedTab, setSelectedTab] = useState(0);
 
   useEffect(() => {
     getNotes();
@@ -37,26 +33,21 @@ function Dashboard() {
       .catch((err) => alert(err));
   };
 
-  // Profile fotoğrafı localStorage'dan alınır, varsa
   const getProfilePicture = () => {
     const storedProfilePic = localStorage.getItem('profile_picture');
     return storedProfilePic ? storedProfilePic : '/default_profile.jpg';
   };
 
-  // Tarih bilgisini formatla
   const timeAgo = (dateString) => {
     const date = new Date(dateString);
-    return formatDistanceToNow(date, { addSuffix: true, locale: enUS }); // İngilizce format
+    return formatDistanceToNow(date, { addSuffix: true, locale: enUS });
   };
 
-  // Filter notes based on the selected tab (articles or videos)
   const filteredNotes = notes.filter((note) => {
     if (selectedTab === 0) {
-      // Articles
       return note.content && note.content.trim().length > 0;
     }
     if (selectedTab === 1) {
-      // Videos
       return note.video && note.video.trim().length > 0;
     }
     return false;
@@ -72,13 +63,27 @@ function Dashboard() {
       sx={{
         display: 'flex',
         justifyContent: 'center',
-        background: 'linear-gradient(90deg, #000, #4B0082)', // Geçişli arka plan
-        minHeight: '100vh', // Tam ekran yüksekliği
-        alignItems: 'center', // Dikeyde ortala
-        padding: 4,
+        background: 'linear-gradient(90deg, #000, #4B0082)',
+        minHeight: '100vh',
+        alignItems: 'center',
+        padding: 0, // Remove padding from the container for full-width image
       }}
     >
-      {/* Tabs for switching between Articles and Videos */}
+      {/* Banner Image Section */}
+      <Box
+        component="img"
+        src="/images/dashboard.jpg"
+        alt="AI Illustration Right"
+        sx={{
+          width: '100%', // Make the image take full width of the screen
+          height: 'auto', // Maintain aspect ratio
+          maxHeight: '400px', // Set max height for banner
+          objectFit: 'cover', // Ensure image covers the container without distortion
+          borderRadius: 0, // No border radius to make it fit neatly
+          marginBottom: 0, // Space between banner and content
+        }}
+      />
+
       <Box
         sx={{
           display: 'flex',
@@ -88,7 +93,7 @@ function Dashboard() {
           backgroundColor: 'white',
           borderRadius: 2,
           padding: 2,
-          width: '80%', // Make the tab container not full-width
+          width: '80%',
         }}
       >
         <Tabs
@@ -99,8 +104,8 @@ function Dashboard() {
           allowScrollButtonsMobile
           aria-label="scrollable force tabs example"
           sx={{
-            width: '100%', // Tam genişlik
-            borderBottom: '1px solid #ddd', // Tab altı çizgisi
+            width: '100%',
+            borderBottom: '1px solid #ddd',
           }}
         >
           <Tab label="Articles" />
@@ -108,16 +113,13 @@ function Dashboard() {
         </Tabs>
       </Box>
 
-      {/* Container to display filtered notes (Articles or Videos) */}
       <Grid
         container
-        spacing={4} // Daha fazla boşluk
-        direction="column" // Kartları dikey sıralamak için
+        spacing={2}
+        direction="row"
         sx={{
           justifyContent: 'center',
-          maxWidth: '1200px', // İçeriği sınırlandır
-          backgroundColor: 'white', // Beyaz container
-          borderRadius: 2,
+          maxWidth: '1000px',
           padding: 4,
         }}
       >
@@ -126,32 +128,42 @@ function Dashboard() {
             <Card
               sx={{
                 padding: 2,
-                boxShadow: 3,
-                backgroundColor: '#ffffff',
-                borderRadius: 5, // Daha yuvarlak köşeler
+                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
+                background:
+                  'linear-gradient(135deg, rgb(249, 249, 249), rgb(84, 31, 120))',
+                borderRadius: 15,
                 position: 'relative',
-                transition: 'transform 0.3s ease-in-out', // Hover efekt ekleyelim
+                transition: 'transform 0.5s ease, box-shadow 0.5s ease',
                 '&:hover': {
-                  transform: 'scale(1.05)', // Hoverda büyüme efekti
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.2)', // Hoverda gölge
+                  transform: 'rotate(-2deg) scale(1.05)',
+                  boxShadow: '0px 8px 30px rgba(0, 0, 0, 0.3)',
                 },
-                marginBottom: 2, // Kartlar arasına daha fazla boşluk
+                marginBottom: 2,
+                maxWidth: '350px',
+                margin: 'auto',
+                maxHeight: '500px',
+                border: '2px solid rgba(255, 255, 255, 0.5)',
               }}
             >
-              <CardContent>
-                {/* Kullanıcı bilgilerini görüntüle */}
+              <CardContent
+                sx={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  borderRadius: 10,
+                  padding: 2,
+                }}
+              >
                 {note.author_full_name && (
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      marginBottom: 2,
+                      marginBottom: 1,
                     }}
                   >
                     <Avatar
                       alt={note.author_full_name}
                       src={getProfilePicture()}
-                      sx={{ width: 50, height: 50, marginRight: 2 }}
+                      sx={{ width: 40, height: 40, marginRight: 1 }}
                     />
                     <Typography variant="body2" fontWeight="bold">
                       {note.author_full_name}
@@ -159,15 +171,14 @@ function Dashboard() {
                   </Box>
                 )}
 
-                {/* Tarihi sağ üst köşeye yerleştirme */}
                 {note.created_at && (
                   <Typography
                     variant="body2"
                     color="textSecondary"
                     sx={{
                       position: 'absolute',
-                      top: 10,
-                      right: 10,
+                      top: 20,
+                      right: 35,
                       fontSize: '0.75rem',
                     }}
                   >
@@ -175,31 +186,45 @@ function Dashboard() {
                   </Typography>
                 )}
 
-                {/* Makale varsa, göster */}
-                {selectedTab === 0 && note.content && (
-                  <Box sx={{ marginBottom: 2 }}>
-                    <Typography variant="body2" gutterBottom>
-                      {note.content}
-                    </Typography>
-                  </Box>
-                )}
-
-                {/* Video kısmı */}
                 {selectedTab === 1 && note.video && (
                   <Box sx={{ marginBottom: 2 }}>
                     <Typography variant="body2" gutterBottom>
                       Video:
                     </Typography>
-                    <Card sx={{ padding: 2, boxShadow: 2, marginBottom: 2 }}>
+                    <Card
+                      sx={{
+                        padding: 1,
+                        boxShadow: 2,
+                        marginBottom: 1,
+                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                      }}
+                    >
                       <video
                         controls
-                        style={{ width: '100%', borderRadius: '8px' }}
+                        style={{
+                          width: '100%',
+                          maxWidth: '240px',
+                          height: 'auto',
+                          borderRadius: '8px',
+                        }}
                       >
                         <source src={note.video} type="video/mp4" />
                         Your browser does not support the video tag.
                       </video>
-                      <Divider sx={{ marginTop: 2 }} /> {/* Çizgi ekle */}
+                      <Divider sx={{ marginTop: 1 }} />
                     </Card>
+                    {note.score && (
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        sx={{
+                          fontWeight: 'bold',
+                          marginTop: 1,
+                        }}
+                      >
+                        Video Skoru: {note.score}
+                      </Typography>
+                    )}
                   </Box>
                 )}
               </CardContent>

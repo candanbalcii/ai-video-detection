@@ -18,7 +18,7 @@ function Profile() {
   useEffect(() => {
     // Get user profile details
     api
-      .get('/api/profile/')
+      .get('http://localhost:8000/api/profile/')
       .then((res) => {
         setUser(res.data);
 

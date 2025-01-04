@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -10,82 +10,52 @@ import {
   Box,
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
+import { useUser } from './UserContext';
 import { ACCESS_TOKEN } from '../constants';
 
 const Navbar = () => {
+  const { user, setUser, isLoggedIn, setIsLoggedIn } = useUser();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const [isFetching, setIsFetching] = useState(false);
   const navigate = useNavigate();
 
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
-
+  const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
+  const handleCloseMenu = () => setAnchorEl(null);
   const handleLogout = () => {
-    console.log('Logging out...');
-    localStorage.removeItem(ACCESS_TOKEN); // Tokeni temizle
+    localStorage.removeItem(ACCESS_TOKEN);
     setIsLoggedIn(false);
     setUser(null);
     navigate('/login');
     handleCloseMenu();
   };
 
-  const fetchUserData = (token) => {
-    fetch('http://localhost:8000/api/profile/', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('User data fetched:', data);
-        setUser({
-          email: data.email,
-          profile_image:
-            data.profile_picture || 'https://via.placeholder.com/40',
-        });
-      })
-      .catch((error) => {
-        console.error('Error fetching user data:', error);
-        setIsLoggedIn(false);
-      });
-  };
-
-  // Sayfa yüklendiğinde token'i kontrol et
   useEffect(() => {
     const storedToken = localStorage.getItem(ACCESS_TOKEN);
-
     if (storedToken) {
       setIsLoggedIn(true);
-      fetchUserData(storedToken); // Token varsa kullanıcı verisini al
+      setIsFetching(true);
+      fetch('http://localhost:8000/api/profile/', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${storedToken}` },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setUser({
+            email: data.email,
+            profile_image:
+              data.profile_picture || 'https://via.placeholder.com/40',
+          });
+          setIsFetching(false);
+        })
+        .catch(() => {
+          setIsLoggedIn(false);
+          setIsFetching(false);
+        });
     } else {
       setIsLoggedIn(false);
-      setUser(null); // Eğer token yoksa, kullanıcıyı çıkart
+      setUser(null);
     }
-  }, []); // Sayfa yüklendiğinde sadece bir kez çalışır
-
-  // Kullanıcı login olduğunda avatar'ı güncellemek için
-  useEffect(() => {
-    if (isLoggedIn && user === null) {
-      const storedToken = localStorage.getItem(ACCESS_TOKEN);
-      if (storedToken) {
-        fetchUserData(storedToken); // Login olduktan sonra avatar hemen görünsün
-      }
-    }
-  }, [isLoggedIn, user]); // Kullanıcı login olursa, avatar'ı al
-
-  // Yönlendirme sonrası avatar'ı göster
-  useEffect(() => {
-    if (isLoggedIn && user) {
-      navigate('/upload'); // Login olduktan sonra upload sayfasına yönlendir
-    }
-  }, [isLoggedIn, user, navigate]); // `isLoggedIn` veya `user` güncellenirse, yönlendir
+  }, [setIsLoggedIn, setUser]);
 
   return (
     <AppBar
@@ -108,7 +78,6 @@ const Navbar = () => {
           >
             Home
           </Button>
-
           <Button
             color="inherit"
             component={Link}
@@ -117,7 +86,6 @@ const Navbar = () => {
           >
             About Us
           </Button>
-
           <Button
             color="inherit"
             component={Link}
@@ -134,12 +102,12 @@ const Navbar = () => {
           </Button>
         </Box>
 
-        {isLoggedIn ? (
+        {isLoggedIn && user && !isFetching ? (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Avatar
               sx={{ margin: '10px', padding: '10px', cursor: 'pointer' }}
               alt="User Avatar"
-              src={user?.profile_image || 'https://via.placeholder.com/40'}
+              src={user.profile_image}
               onClick={handleMenuClick}
             />
             <Menu
