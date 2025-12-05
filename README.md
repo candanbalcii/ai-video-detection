@@ -90,8 +90,8 @@ By creating a trustworthy method to differentiate between AI-generated and real 
 
 We created our own dataset consisting of:
 
-- ✅ **AI-generated videos** (via video synthesis tools)
-- 🎥 **Real videos** (human activities)
+-  **AI-generated videos** (via video synthesis tools)
+-  **Real videos** (human activities)
 
 
 ---
