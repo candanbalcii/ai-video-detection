@@ -5,7 +5,7 @@ This project provides a platform to **detect AI-generated videos**, aiming to bu
 
 ---
 
-## 🎯 Project Objective
+##  Project Objective
 
 By creating a trustworthy method to differentiate between AI-generated and real videos, our project:
 
@@ -15,18 +15,18 @@ By creating a trustworthy method to differentiate between AI-generated and real 
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Layer        | Technology               |
 |--------------|--------------------------|
-| 👨‍💻 Frontend | React                    |
-| 🔧 Backend    | Django, REST Framework                   |
-| 🤖 ML Model   | CNN-based Deep Learning |
-| 🧪 Dataset    | Custom-built dataset     |
+|  Frontend | React                    |
+|  Backend    | Django, REST Framework                   |
+|  ML Model   | CNN-based Deep Learning |
+|  Dataset    | Custom-built dataset     |
 
 ---
 
-## 📂 Features
+##  Features
 
 - User **authentication** (Sign up, Log in)
 - **Video upload** interface
@@ -36,7 +36,7 @@ By creating a trustworthy method to differentiate between AI-generated and real 
 
 ---
 
-## 🔁 Workflow
+##  Workflow
 
 1. **User Uploads Video**  
    The user uploads a video through the React interface.
@@ -51,34 +51,34 @@ By creating a trustworthy method to differentiate between AI-generated and real 
    The score is presented to the user with an intuitive UI.
 
 ---
-## 📱 Pages Overview
+##  Pages Overview
 
-### 🏠 Main Page
+###  Main Page
 ![main1](https://github.com/user-attachments/assets/784716db-80df-4919-b420-9375d2adf5df)
 ![main2](https://github.com/user-attachments/assets/e70b48cd-76dd-4978-a298-dec44e23c8aa)
 ![main3](https://github.com/user-attachments/assets/d256522f-722f-4b43-baa1-9e7d2e60a360)
 
 
-### 🔐 Login Page
+###  Login Page
 ![login](https://github.com/user-attachments/assets/f9827fa9-b63b-4bd5-bcf6-a55851366424)
 
 
-### 📝 Registration Page
+###  Registration Page
 ![register](https://github.com/user-attachments/assets/645f02dc-83f3-4e3e-a789-e2939b5207a9)
 
 
-### 📊 Video Upload Page
+###  Video Upload Page
 ![videoupload](https://github.com/user-attachments/assets/548b7b28-ddfd-4654-84f3-3a9629aef87f)
 
-### 📊 Result Page
+###  Result Page
 ![result](https://github.com/user-attachments/assets/433d71d4-c657-47ea-adb1-9e223093e61e)
 
 
-### ℹ️ About Us Page
+###  About Us Page
 ![aboutus](https://github.com/user-attachments/assets/3e380c1f-29dd-4e33-afd4-358071c6e7f1)
 
 
-### 📧 Contact Us Page
+###  Contact Us Page
 ![contactus](https://github.com/user-attachments/assets/a1cae7a3-eb91-4cf0-af75-e998d78fdb01)
 
 
@@ -86,7 +86,7 @@ By creating a trustworthy method to differentiate between AI-generated and real 
 
 
 
-## 📊 Dataset
+##  Dataset
 
 We created our own dataset consisting of:
 
